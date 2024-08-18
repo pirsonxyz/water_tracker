@@ -56,6 +56,7 @@ async function viewWater() {
     waterdiv.innerHTML = `<p>${text}</p>`;
   } catch (error) {
     console.error("Error in viewWater:", error);
-    waterdiv.innerHTML = "An error occurred while fetching water data.";
+    waterdiv.innerHTML =
+      "An error occurred while fetching water data. Is server running?";
   }
 }

@@ -43,6 +43,8 @@ async function updateWater() {
       water_intake: parseInt(water_intake, 10),
     }),
   });
+  document.getElementById("updated").innerHTML =
+    `<p>You drank ${water_intake}ml!</p>`;
 }
 
 async function viewWater() {

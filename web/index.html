@@ -12,10 +12,10 @@
             Water
             <h2>
                 Add entry
-                <form id="waterForm">
+                <form  onsubmit="return false" id="waterForm">
                   <input type="number" id="water_intake" required>
                   <input type="number" id="target" required>
-                  <button onclick="sendWater()">Send Water</button>
+                  <button type= "button" "sendWater()">Send Water</button>
                 </form>
                 <div id="serverResponse"></div>
             </h2>
@@ -25,11 +25,12 @@
                     <div id="waterView"></div>
                 </form>
             </h2>
-            <h2>Update entry
-                <form id="waterForm">
+            <h2>Update entry</h2>
+            <form id="waterForm">
               <input type="number" id="water_intake_update" required>
-              <button onclick="updateWater()">Send Water</button>
+              <button type="button" onclick="updateWater()">Send Water</button>
             </form>
+            <div id="updated"></div>
         </h1>
     </body>
 </html>

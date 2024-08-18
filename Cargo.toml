@@ -18,3 +18,4 @@ sqlx = { version = "0.8", features = [
     "tls-native-tls",
 ] }
 tokio = { version = "1.39.2", features = ["full"] }
+tower-http = { version = "0.5.2", features = ["cors"] }

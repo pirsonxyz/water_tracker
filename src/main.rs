@@ -11,9 +11,15 @@ use serde_json::json;
 use sqlx::sqlite::{SqlitePool, SqliteQueryResult};
 use sqlx::{Pool, Row, Sqlite};
 use tokio::{self};
+use tower_http::cors::{Any, CorsLayer};
 
 type QueryResult = Result<SqliteQueryResult, sqlx::Error>;
 const DATABASE_URL: &str = dotenv!("DATABASE_URL");
+const URL: &str = if option_env!("URL").is_some() {
+    dotenv!("URL")
+} else {
+    "0.0.0.0:3000"
+};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct Water {
     /// Current timestamp, automatically created
@@ -94,12 +100,19 @@ async fn create_connection() -> Pool<Sqlite> {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
+    let cors = CorsLayer::new()
+        .allow_methods(Any)
+        .allow_origin(Any)
+        .allow_headers(Any);
     let app = Router::new()
         .route("/", get(root))
         .route("/view_water", get(view_water))
         .route("/add_water", post(add_water))
-        .route("/update_water", post(update_water));
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+        .route("/update_water", post(update_water))
+        .layer(cors);
+    let listener = tokio::net::TcpListener::bind(URL).await.unwrap();
+    println!("Listening on {}", URL);
+
     axum::serve(listener, app).await.unwrap();
 
     Ok(())
@@ -108,19 +121,22 @@ async fn root() -> &'static str {
     "Server is up and running!\n"
 }
 async fn add_water(Json(payload): Json<WaterPayload>) -> (StatusCode, Json<Water>) {
+    println!("Got request");
     // For debug
     let pool = create_connection().await;
     let water = Water::new(payload.water_intake, payload.target);
-    println!("Received request: {:?}", water);
     water.insert_water(&pool).await.unwrap();
+    println!("Received request: {:?}", water);
     (StatusCode::CREATED, Json(water))
 }
 async fn view_water() -> String {
+    println!("Received get request for water");
     let pool = create_connection().await;
     let db = display_db(&pool).await;
     db.into_iter().collect()
 }
 async fn update_water(Json(payload): Json<UpdateWater>) -> (StatusCode, Json<String>) {
+    println!("Updating water...");
     let pool = create_connection().await;
     let latest_id: i32 = sqlx::query("SELECT MAX(id) as max_id FROM water")
         .fetch_one(&pool)

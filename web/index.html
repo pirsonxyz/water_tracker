@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="author" content="Pirson Bethancourt" />
+        <script src="index.js"></script>
+        <title>Water tracker</title>
+    </head>
+    <body>
+        <h1>
+            Water
+            <h2>
+                Add entry
+                <form id="waterForm">
+                  <input type="number" id="water_intake" required>
+                  <input type="number" id="target" required>
+                  <button onclick="sendWater()">Send Water</button>
+                </form>
+                <div id="serverResponse"></div>
+            </h2>
+            <h2>
+                View water
+                    <button onclick="viewWater()">Click me to view the db entries</button>
+                    <div id="waterView"></div>
+                </form>
+            </h2>
+            <h2>Update entry
+                <form id="waterForm">
+              <input type="number" id="water_intake_update" required>
+              <button onclick="updateWater()">Send Water</button>
+            </form>
+        </h1>
+    </body>
+</html>

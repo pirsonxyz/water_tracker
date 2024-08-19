@@ -28,6 +28,7 @@ struct Water {
     water_intake: i32,
     /// The target water intake(ml)
     target: i32,
+    /// Percentage that is automatically calculate when creating a new water instance
     percentage: f32,
 }
 #[derive(Serialize, Deserialize, Debug)]

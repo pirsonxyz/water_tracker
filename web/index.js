@@ -24,7 +24,10 @@ async function sendWater() {
 
     const server_response = await response.json();
     console.log("Server response:", server_response);
-    server_response_div.innerHTML = JSON.stringify(server_response);
+    const server_response_json = JSON.parse(JSON.stringify(server_response));
+    server_response_div.innerHTML = `<p>${server_response_json["timestamp"]} ${server_response_json["water_intake"]
+      } ${server_response_json["target"]} ${server_response_json["percentage"]
+      }</p>`;
   } catch (error) {
     console.error("Error in sendWater:", error);
     server_response_div.innerHTML = "An error occurred. Is server running?";

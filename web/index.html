@@ -15,7 +15,7 @@
                 <form  onsubmit="return false" id="waterForm">
                   <input type="number" id="water_intake" required>
                   <input type="number" id="target" required>
-                  <button type= "button" "sendWater()">Send Water</button>
+                  <button onclick ="sendWater()">Send Water</button>
                 </form>
                 <div id="serverResponse"></div>
             </h2>
@@ -23,7 +23,6 @@
                 View water
                     <button onclick="viewWater()">Click me to view the db entries</button>
                     <div id="waterView"></div>
-                </form>
             </h2>
             <h2>Update entry</h2>
             <form id="waterForm">

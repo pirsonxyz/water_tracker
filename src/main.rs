@@ -183,3 +183,4 @@ async fn update_water(Json(payload): Json<UpdateWater>) -> (StatusCode, Json<Str
     (StatusCode::OK, Json(response))
 }
 // TODO: create a get_percentage function!
+//fn get_percentage()

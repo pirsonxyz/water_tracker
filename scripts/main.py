@@ -1,13 +1,14 @@
 import requests
-water_intake = int(input("Enter the water intake: "))
-target = int(input("Enter target: "))
-r = requests.post("http://localhost:3000/add_water", json={
-    "water_intake": water_intake,
-    "target": target,
-})
-print(r.json())
-new = int(input("Enter new intake: "))
-u = requests.post("http://localhost:3000/update_water", json={
-    "water_intake": new
-})
-print(u.json())
+
+for i in range(1,101):
+    try:
+        url = f"http://10.0.0.{i}:3000/sanity"
+        print(url)
+        response = requests.get(url)
+        print(response.status_code)
+        if response.status_code == 200:
+            print(f"Encontre url {url}")
+            break;
+    except:
+        print("URL no es")
+        continue;

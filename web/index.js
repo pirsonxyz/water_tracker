@@ -25,9 +25,11 @@ async function sendWater() {
     const server_response = await response.json();
     console.log("Server response:", server_response);
     const server_response_json = JSON.parse(JSON.stringify(server_response));
-    server_response_div.innerHTML = `<p>${server_response_json["timestamp"]} ${server_response_json["water_intake"]
-      } ${server_response_json["target"]} ${server_response_json["percentage"]
-      }</p>`;
+    server_response_div.innerHTML = `<p>${server_response_json["timestamp"]} ${
+      server_response_json["water_intake"]
+    } ${server_response_json["target"]} ${
+      server_response_json["percentage"]
+    }</p>`;
   } catch (error) {
     console.error("Error in sendWater:", error);
     server_response_div.innerHTML = "An error occurred. Is server running?";
@@ -54,6 +56,21 @@ async function viewWater() {
   const waterdiv = document.getElementById("waterView");
   try {
     const response = await fetch(`${SERVER_URL}/view_water`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const text = await response.text();
+    waterdiv.innerHTML = `<p>${text}</p>`;
+  } catch (error) {
+    console.error("Error in viewWater:", error);
+    waterdiv.innerHTML =
+      "An error occurred while fetching water data. Is server running?";
+  }
+}
+async function viewPercentage() {
+  const waterdiv = document.getElementById("waterView");
+  try {
+    const response = await fetch(`${SERVER_URL}/percentage`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }

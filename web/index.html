@@ -1,35 +1,43 @@
 <!doctype html>
 <html>
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="author" content="Pirson Bethancourt" />
-        <script src="index.js"></script>
-        <title>Water tracker</title>
-        <link rel="stylesheet" href="index.css">
-    </head>
-    <body>
-        <h1>
-            Water
-            <h2>
-                Add entry
-                <form  onsubmit="return false" id="waterForm">
-                  <input type="number" id="water_intake" required>
-                  <input type="number" id="target" required>
-                  <button onclick ="sendWater()">Send Water</button>
-                </form>
-                <div id="serverResponse"></div>
-            </h2>
-            <h2>
-                View water
-                    <button onclick="viewWater()">Click me to view the db entries</button>
-                    <div id="waterView"></div>
-            </h2>
-            <h2>Update entry</h2>
-            <form id="waterForm">
-              <input type="number" id="water_intake_update" required>
-              <button type="button" onclick="updateWater()">Send Water</button>
-            </form>
-            <div id="updated"></div>
-        </h1>
-    </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="author" content="Pirson Bethancourt" />
+  <script src="index.js"></script>
+  <title>Water tracker</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+  <h1>
+    Water
+    <h2>
+      Add entry
+      <form onsubmit="return false" id="waterForm">
+        <input type="number" id="water_intake" required>
+        <input type="number" id="target" required>
+        <button onclick="sendWater()">Send Water</button>
+      </form>
+      <div id="serverResponse"></div>
+    </h2>
+    <h2>
+      View water
+      <button onclick="viewWater()">Click me to view the db entries</button>
+      <div id="waterView"></div>
+    </h2>
+    <h2>
+      View percentage
+      <button onclick="viewPercentage()">Click me to view the percentage of daily water you have drank</button>
+      <div id="waterView"></div>
+    </h2>
+    <h2>Update entry</h2>
+    <form id="waterForm">
+      <input type="number" id="water_intake_update" required>
+      <button type="button" onclick="updateWater()">Send Water</button>
+    </form>
+    <div id="updated"></div>
+  </h1>
+</body>
+
 </html>

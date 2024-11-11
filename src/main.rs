@@ -49,9 +49,7 @@ impl Water {
             percentage: (water_intake as f32 * 100.0) / target as f32,
         }
     }
-    fn get_percentage(&self) -> f32 {
-        self.percentage
-    }
+
     async fn insert_water(&self, pool: &SqlitePool) -> QueryResult {
         sqlx::query("INSERT INTO water (date, water_intake, target) VALUES (?,?,?)")
             .bind(self.timestamp.as_str())
@@ -185,7 +183,6 @@ async fn update_water(Json(payload): Json<UpdateWater>) -> (StatusCode, Json<Str
     .to_string();
     (StatusCode::OK, Json(response))
 }
-// TODO: create a get_percentage function!
 async fn get_percentage() -> String {
     let pool = create_connection().await;
     let query = sqlx::query("SELECT water_intake, target FROM water")

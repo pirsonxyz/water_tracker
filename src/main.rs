@@ -185,12 +185,15 @@ async fn update_water(Json(payload): Json<UpdateWater>) -> (StatusCode, Json<Str
 }
 async fn get_percentage() -> String {
     let pool = create_connection().await;
-    let query = sqlx::query("SELECT water_intake, target FROM water")
+    if let Ok(query) = sqlx::query("SELECT water_intake, target FROM water")
         .fetch_one(&pool)
         .await
-        .unwrap();
-    let intake: i32 = query.get("water_intake");
-    let target: i32 = query.get("target");
-    let percentage = (intake as f32 * 100.0) / target as f32;
-    format!("{percentage}%")
+    {
+        let intake: i32 = query.get("water_intake");
+        let target: i32 = query.get("target");
+        let percentage = (intake as f32 * 100.0) / target as f32;
+        format!("{percentage}%")
+    } else {
+        format!("There are no entries available")
+    }
 }

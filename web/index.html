@@ -15,8 +15,8 @@
     <h2>
       Add entry
       <form onsubmit="return false" id="waterForm">
-        <input type="number" id="water_intake" required>
-        <input type="number" id="target" required>
+        <input type="number" id="water_intake" placeholder="water you drank" required>
+        <input type="number" id="target" placeholder="your target for the day" required>
         <button onclick="sendWater()">Send Water</button>
       </form>
       <div id="serverResponse"></div>

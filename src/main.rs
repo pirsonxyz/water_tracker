@@ -1,3 +1,4 @@
+use core::fmt;
 use std::error::Error;
 
 use axum::{
@@ -66,12 +67,12 @@ impl Water {
             .await
     }
 }
-async fn display_db(pool: &SqlitePool) -> Vec<String> {
+async fn display_db(pool: &SqlitePool) -> String {
     let rows = sqlx::query("SELECT date, water_intake, target FROM water")
         .fetch_all(pool)
         .await
         .unwrap();
-    let mut db: Vec<String> = Vec::new();
+    let mut db: String = String::new();
     for row in rows {
         let date: &str = row.get("date");
         let water_intake: i32 = row.get("water_intake");
@@ -79,13 +80,14 @@ async fn display_db(pool: &SqlitePool) -> Vec<String> {
         let water_intake = water_intake as f32;
         let target = target as f32;
         let percent = (water_intake * 100.0) / target;
-        db.push(format!(
+        db.push_str(format!(
             "date = {}, water_intake = {}, target = {}, percent = {}\n",
             date, water_intake, target, percent
-        ));
+        ).as_str());
     }
     db
 }
+
 async fn create_connection() -> Pool<Sqlite> {
     let pool = SqlitePool::connect(DATABASE_URL).await.unwrap();
     let start_query = r#"
@@ -134,8 +136,12 @@ async fn add_water(Json(payload): Json<WaterPayload>) -> (StatusCode, Json<Water
 async fn view_water() -> String {
     println!("Received get request for water");
     let pool = create_connection().await;
-    let db = display_db(&pool).await;
-    db.into_iter().collect()
+    let water = display_db(&pool).await;
+    if water.is_empty() {
+        "There is no water".to_string()
+    } else {
+        water
+    }
 }
 async fn update_water(Json(payload): Json<UpdateWater>) -> (StatusCode, Json<String>) {
     println!("Updating water...");

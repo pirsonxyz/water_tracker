@@ -41,6 +41,10 @@ struct WaterPayload {
 struct UpdateWater {
     water_intake: i32,
 }
+#[derive(Serialize, Deserialize, Debug)]
+struct ViewWaterById {
+    id: i32,
+}
 impl Water {
     fn new(water_intake: i32, target: i32) -> Self {
         Self {
@@ -68,12 +72,13 @@ impl Water {
     }
 }
 async fn display_db(pool: &SqlitePool) -> String {
-    let rows = sqlx::query("SELECT date, water_intake, target FROM water")
+    let rows = sqlx::query("SELECT * FROM water")
         .fetch_all(pool)
         .await
         .unwrap();
     let mut db: String = String::new();
     for row in rows {
+        let id: i32 = row.get("id");
         let date: &str = row.get("date");
         let water_intake: i32 = row.get("water_intake");
         let target: i32 = row.get("target");
@@ -81,13 +86,29 @@ async fn display_db(pool: &SqlitePool) -> String {
         let target = target as f32;
         let percent = (water_intake * 100.0) / target;
         db.push_str(format!(
-            "date = {}, water_intake = {}, target = {}, percent = {}\n",
+            "id = {} date = {}, water_intake = {}, target = {}, percent = {}\n", id, 
             date, water_intake, target, percent
         ).as_str());
     }
     db
 }
-
+async fn get_water_by_id(pool: &SqlitePool, id: i32) -> String  {
+    if let Ok(query) = sqlx::query("SELECT * FROM water WHERE id = ?").bind(id).fetch_one(pool).await {
+         let id: i32 = query.get("id");
+        let date: &str = query.get("date");
+        let water_intake: i32 = query.get("water_intake");
+         let target: i32 = query.get("target");
+        let water_intake = water_intake as f32;
+        let target = target as f32;
+        let percent = (water_intake * 100.0) / target;
+        format!(
+            "id = {} date = {}, water_intake = {}, target = {}, percent = {}\n", id,
+            date, water_intake, target, percent)
+    }
+    else {
+        format!("Water with id {} not found", id)
+    }
+}
 async fn create_connection() -> Pool<Sqlite> {
     let pool = SqlitePool::connect(DATABASE_URL).await.unwrap();
     let start_query = r#"
@@ -113,6 +134,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .route("/view_water", get(view_water))
         .route("/percentage", get(get_percentage))
         .route("/add_water", post(add_water))
+        .route("/view_water_id", post(get_water_id))
         .layer(cors);
     let listener = tokio::net::TcpListener::bind(URL).await.unwrap();
     println!("Listening on {}", URL);
@@ -187,9 +209,11 @@ async fn update_water(Json(payload): Json<UpdateWater>) -> (StatusCode, Json<Str
         "updated entry": updated_entry,
     })
     .to_string();
+    println!("Sending response: {}", response);
     (StatusCode::OK, Json(response))
 }
 async fn get_percentage() -> String {
+    println!("Viewing percentage");
     let pool = create_connection().await;
     if let Ok(query) = sqlx::query("SELECT water_intake, target FROM water")
         .fetch_one(&pool)
@@ -202,4 +226,10 @@ async fn get_percentage() -> String {
     } else {
         format!("There are no entries available")
     }
+}
+async fn get_water_id(Json(view_water_by_id): Json<ViewWaterById>) -> String {
+    println!("Got request to get water with id {}", view_water_by_id.id);
+    let conn = create_connection().await;
+    let water = get_water_by_id(&conn, view_water_by_id.id).await;
+    water
 }

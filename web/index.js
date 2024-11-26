@@ -6,7 +6,7 @@ async function sendWater() {
   const server_response_div = document.getElementById("serverResponse");
 
   try {
-    console.log("Sending data:", { water_intake, target });
+    console.log(`Sending data: ${water_intake}, ${target}`);
     const response = await fetch(`${SERVER_URL}/add_water`, {
       method: "POST",
       headers: {
@@ -81,4 +81,16 @@ async function viewPercentage() {
     waterdiv.innerHTML =
       "An error occurred while fetching water data. Is server running?";
   }
+}
+async function ViewWaterById() {
+  const water_id = document.getElementById("water_id").value;
+  const water_div = document.getElementById("waterView");
+  const body = JSON.stringify({id: parseInt(water_id, 10)});
+  const response = await fetch(`${SERVER_URL}/view_water_id`, {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: body
+  })
+  const text = await response.text();
+  water_div.innerHTML = `<p>${text}</p>`
 }

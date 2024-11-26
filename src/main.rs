@@ -78,10 +78,10 @@ fn format_row(row: SqliteRow) -> String {
      let target: i32 = row.get("target");
     let water_intake = water_intake as f32;
     let target = target as f32;
-    let percent = (water_intake * 100.0) / target;
+    let percentage = ((water_intake * 100.0) / target).round();
     format!(
-        "id = {} date = {}, water_intake = {}, target = {}, percent = {}\n", id,
-        date, water_intake, target, percent)
+        "id = {} date = {}, water_intake = {}, target = {}, percentage = {}\n", id,
+        date, water_intake, target, percentage)
 }
 async fn display_db(pool: &SqlitePool) -> String {
     let rows = sqlx::query("SELECT * FROM water")
@@ -214,9 +214,10 @@ async fn get_percentage() -> String {
         .fetch_one(&pool)
         .await
     {
-        let intake: i32 = query.get("water_intake");
+        let water_intake: i32 = query.get("water_intake");
         let target: i32 = query.get("target");
-        let percentage = (intake as f32 * 100.0) / target as f32;
+        let percentage = ((water_intake as f32 * 100.0) / target as f32).round();
+        
         format!("{percentage}%")
     } else {
         format!("There are no entries available")

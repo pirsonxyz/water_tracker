@@ -9,7 +9,7 @@ use axum::{
 use dotenv_codegen::dotenv;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use sqlx::sqlite::{SqlitePool, SqliteQueryResult};
+use sqlx::sqlite::{SqlitePool, SqliteQueryResult, SqliteRow};
 use sqlx::{Pool, Row, Sqlite};
 use tokio::{self};
 use tower_http::cors::{Any, CorsLayer};
@@ -71,6 +71,18 @@ impl Water {
             .await
     }
 }
+fn format_row(row: SqliteRow) -> String {
+    let id: i32 = row.get("id");
+    let date: &str = row.get("date");
+    let water_intake: i32 = row.get("water_intake");
+     let target: i32 = row.get("target");
+    let water_intake = water_intake as f32;
+    let target = target as f32;
+    let percent = (water_intake * 100.0) / target;
+    format!(
+        "id = {} date = {}, water_intake = {}, target = {}, percent = {}\n", id,
+        date, water_intake, target, percent)
+}
 async fn display_db(pool: &SqlitePool) -> String {
     let rows = sqlx::query("SELECT * FROM water")
         .fetch_all(pool)
@@ -78,32 +90,14 @@ async fn display_db(pool: &SqlitePool) -> String {
         .unwrap();
     let mut db: String = String::new();
     for row in rows {
-        let id: i32 = row.get("id");
-        let date: &str = row.get("date");
-        let water_intake: i32 = row.get("water_intake");
-        let target: i32 = row.get("target");
-        let water_intake = water_intake as f32;
-        let target = target as f32;
-        let percent = (water_intake * 100.0) / target;
-        db.push_str(format!(
-            "id = {} date = {}, water_intake = {}, target = {}, percent = {}\n", id, 
-            date, water_intake, target, percent
-        ).as_str());
+        let row = format_row(row);
+        db.push_str(&row);
     }
     db
 }
 async fn get_water_by_id(pool: &SqlitePool, id: i32) -> String  {
     if let Ok(query) = sqlx::query("SELECT * FROM water WHERE id = ?").bind(id).fetch_one(pool).await {
-         let id: i32 = query.get("id");
-        let date: &str = query.get("date");
-        let water_intake: i32 = query.get("water_intake");
-         let target: i32 = query.get("target");
-        let water_intake = water_intake as f32;
-        let target = target as f32;
-        let percent = (water_intake * 100.0) / target;
-        format!(
-            "id = {} date = {}, water_intake = {}, target = {}, percent = {}\n", id,
-            date, water_intake, target, percent)
+         format_row(query)
     }
     else {
         format!("Water with id {} not found", id)
@@ -135,6 +129,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
         .route("/percentage", get(get_percentage))
         .route("/add_water", post(add_water))
         .route("/view_water_id", post(get_water_id))
+        .route("/update_water", post(update_water))
         .layer(cors);
     let listener = tokio::net::TcpListener::bind(URL).await.unwrap();
     println!("Listening on {}", URL);

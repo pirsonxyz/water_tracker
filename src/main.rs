@@ -14,7 +14,7 @@ use tokio::{self};
 use tower_http::cors::{Any, CorsLayer};
 
 type QueryResult = Result<SqliteQueryResult, sqlx::Error>;
-const DATABASE_URL: &str = dotenv!("DATABASE_URL");
+const DATABASE_PATH: &str = dotenv!("DATABASE_PATH");
 const URL: &str = if option_env!("URL").is_some() {
     dotenv!("URL")
 } else {
@@ -108,7 +108,7 @@ async fn get_water_by_id(pool: &SqlitePool, id: i32) -> String {
     }
 }
 async fn create_connection() -> Pool<Sqlite> {
-    let pool = SqlitePool::connect(DATABASE_URL).await.unwrap();
+    let pool = SqlitePool::connect(DATABASE_PATH).await.unwrap();
     let start_query = r#"
       CREATE TABLE IF NOT EXISTS water (
           id INTEGER PRIMARY KEY AUTOINCREMENT,

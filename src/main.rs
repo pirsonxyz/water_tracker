@@ -20,6 +20,7 @@ const URL: &str = if option_env!("URL").is_some() {
 } else {
     "0.0.0.0:3000"
 };
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct Water {
     /// Current timestamp, automatically created

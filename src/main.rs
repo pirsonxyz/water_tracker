@@ -74,13 +74,14 @@ fn format_row(row: SqliteRow) -> String {
     let id: i32 = row.get("id");
     let date: &str = row.get("date");
     let water_intake: i32 = row.get("water_intake");
-     let target: i32 = row.get("target");
+    let target: i32 = row.get("target");
     let water_intake = water_intake as f32;
     let target = target as f32;
     let percentage = ((water_intake * 100.0) / target).round();
     format!(
-        "id = {} date = {}, water_intake = {}, target = {}, percentage = {}\n", id,
-        date, water_intake, target, percentage)
+        "id = {} date = {}, water_intake = {}, target = {}, percentage = {}\n",
+        id, date, water_intake, target, percentage
+    )
 }
 async fn display_db(pool: &SqlitePool) -> String {
     let rows = sqlx::query("SELECT * FROM water")
@@ -94,11 +95,14 @@ async fn display_db(pool: &SqlitePool) -> String {
     }
     db
 }
-async fn get_water_by_id(pool: &SqlitePool, id: i32) -> String  {
-    if let Ok(query) = sqlx::query("SELECT * FROM water WHERE id = ?").bind(id).fetch_one(pool).await {
-         format_row(query)
-    }
-    else {
+async fn get_water_by_id(pool: &SqlitePool, id: i32) -> String {
+    if let Ok(query) = sqlx::query("SELECT * FROM water WHERE id = ?")
+        .bind(id)
+        .fetch_one(pool)
+        .await
+    {
+        format_row(query)
+    } else {
         format!("Water with id {} not found", id)
     }
 }
@@ -216,7 +220,7 @@ async fn get_percentage() -> String {
         let water_intake: i32 = query.get("water_intake");
         let target: i32 = query.get("target");
         let percentage = ((water_intake as f32 * 100.0) / target as f32).round();
-        
+
         format!("{percentage}%")
     } else {
         format!("There are no entries available")
